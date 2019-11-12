@@ -5,12 +5,41 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
 
   this.startTiles     = 2;
+  this.robotRunning   = false;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("runRobot", function() {
+    this.robotRunning = toggleStartButton()
+    this.runRobot();
+  }.bind(this));
 
   this.setup();
+}
+
+// The AI that plays the game automatically
+GameManager.prototype.runRobot = function () {
+  if (!this.robotRunning) {
+    return;
+  }
+  this.move(getRandomMove());
+
+  var self = this;
+  setTimeout(function() {
+      self.runRobot();
+    }, 500);
+};
+
+function toggleStartButton(){
+  var startButton = document.getElementById("start-button")
+  if (startButton.innerHTML == "Start Robot"){
+    startButton.innerHTML = "Pause";
+    return true;
+  } else {
+    startButton.innerHTML = "Start Robot";
+    return false;
+  }
 }
 
 // Restart the game
@@ -49,6 +78,7 @@ GameManager.prototype.setup = function () {
     this.over        = false;
     this.won         = false;
     this.keepPlaying = false;
+    this.robotRunning = false;
 
     // Add the initial tiles
     this.addStartTiles();

@@ -71,6 +71,11 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
+  document.getElementById("start-button").addEventListener('click', function(e) {
+    e.preventDefault();
+    self.emit('runRobot')
+  })
+
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
