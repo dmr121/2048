@@ -5,7 +5,7 @@ function getGameState() {
 
 console.log(this.getGameState());
 
-function getRandomMove() {
+function getBestMove() {
 	var randNum = Math.floor(Math.random() * 4);
 	return randNum;
 }

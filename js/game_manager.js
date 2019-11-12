@@ -23,7 +23,7 @@ GameManager.prototype.runRobot = function () {
   if (!this.robotRunning) {
     return;
   }
-  this.move(getRandomMove());
+  this.move(getBestMove());
 
   var self = this;
   setTimeout(function() {
