@@ -10,6 +10,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+
   this.inputManager.on("runRobot", function() {
     this.robotRunning = toggleStartButton()
     this.runRobot();
@@ -23,12 +24,15 @@ GameManager.prototype.runRobot = function () {
   if (!this.robotRunning) {
     return;
   }
-  this.move(getBestMove());
+
+  var bestMove = getBestMove(this.storageManager.getGameState(), this.score);
+
+  this.move(bestMove);
 
   var self = this;
   setTimeout(function() {
-      self.runRobot();
-    }, 500);
+    self.runRobot();
+  }, 100);
 };
 
 function toggleStartButton(){
@@ -44,6 +48,8 @@ function toggleStartButton(){
 
 // Restart the game
 GameManager.prototype.restart = function () {
+  document.getElementById("start-button").innerHTML = "Start Robot";
+  this.robotRunning = false;
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
