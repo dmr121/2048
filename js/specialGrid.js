@@ -1,10 +1,10 @@
-function Grid(size, previousState) {
+function sGrid(size, previousState) {
   this.size = size;
   this.cells = previousState ? this.fromState(previousState) : this.empty();
 }
 
 // Build a list of positions to traverse in the right order
-Grid.prototype.buildTraversals = function (vector) {
+sGrid.prototype.buildTraversals = function (vector) {
   var traversals = { x: [], y: [] };
 
   for (var pos = 0; pos < 4; pos++) {
@@ -19,7 +19,7 @@ Grid.prototype.buildTraversals = function (vector) {
   return traversals;
 };
 
-Grid.prototype.findFarthestPosition = function (cell, vector) {
+sGrid.prototype.findFarthestPosition = function (cell, vector) {
   var previous;
 
   // Progress towards the vector direction until an obstacle is found
@@ -35,12 +35,12 @@ Grid.prototype.findFarthestPosition = function (cell, vector) {
   };
 };
 
-Grid.prototype.movesAvailable = function () {
+sGrid.prototype.movesAvailable = function () {
   return this.cellsAvailable() || this.tileMatchesAvailable();
 };
 
 // Check for available matches between tiles (more expensive check)
-Grid.prototype.tileMatchesAvailable = function () {
+sGrid.prototype.tileMatchesAvailable = function () {
   var self = this;
 
   var tile;
@@ -67,12 +67,12 @@ Grid.prototype.tileMatchesAvailable = function () {
   return false;
 };
 
-Grid.prototype.positionsEqual = function (first, second) {
+sGrid.prototype.positionsEqual = function (first, second) {
   return first.x === second.x && first.y === second.y;
 };
 
 // Save all tile positions and remove merger info
-Grid.prototype.prepareTiles = function () {
+sGrid.prototype.prepareTiles = function () {
   this.eachCell(function (x, y, tile) {
     if (tile) {
       tile.mergedFrom = null;
@@ -82,14 +82,14 @@ Grid.prototype.prepareTiles = function () {
 };
 
 // Move a tile and its representation
-Grid.prototype.moveTile = function (tile, cell) {
+sGrid.prototype.moveTile = function (tile, cell) {
   this.cells[tile.x][tile.y] = null;
   this.cells[cell.x][cell.y] = tile;
   tile.updatePosition(cell);
 };
 
 // Get the vector representing the chosen direction
-Grid.prototype.getVector = function (direction) {
+sGrid.prototype.getVector = function (direction) {
   // Vectors representing tile movement
   var map = {
     0: { x: 0,  y: -1 }, // Up
@@ -102,7 +102,7 @@ Grid.prototype.getVector = function (direction) {
 };
 
 // Adds a tile in a random position
-Grid.prototype.addRandomTile = function () {
+sGrid.prototype.addRandomTile = function () {
   if (this.cellsAvailable()) {
     var value = Math.random() < 0.9 ? 2 : 4;
     var tile = new Tile(this.randomAvailableCell(), value);
@@ -111,8 +111,8 @@ Grid.prototype.addRandomTile = function () {
   }
 };
 
-// Move tiles on the grid in the specified direction
-Grid.prototype.move = function (direction, score) {
+// Move tiles on the sgrid in the specified direction
+sGrid.prototype.move = function (direction, score) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
@@ -125,7 +125,7 @@ Grid.prototype.move = function (direction, score) {
   // Save the current tile positions and remove merger information
   this.prepareTiles();
 
-  // Traverse the grid in the right direction and move tiles
+  // Traverse the sgrid in the right direction and move tiles
   traversals.x.forEach(function (x) {
     traversals.y.forEach(function (y) {
       cell = { x: x, y: y };
@@ -159,11 +159,22 @@ Grid.prototype.move = function (direction, score) {
       }
     });
   });
-  return score;
+
+  var over = false;
+  if (moved) {
+    this.addRandomTile();
+
+    if (!this.movesAvailable()) {
+      over = true; // Game over!
+    }
+
+  }
+
+  return {score: score, moved: moved, over: over};
 };
 
-// Build a grid of the specified size
-Grid.prototype.empty = function () {
+// Build a sgrid of the specified size
+sGrid.prototype.empty = function () {
   var cells = [];
 
   for (var x = 0; x < this.size; x++) {
@@ -177,7 +188,7 @@ Grid.prototype.empty = function () {
   return cells;
 };
 
-Grid.prototype.fromState = function (state) {
+sGrid.prototype.fromState = function (state) {
   var cells = [];
 
   for (var x = 0; x < this.size; x++) {
@@ -193,7 +204,7 @@ Grid.prototype.fromState = function (state) {
 };
 
 // Find the first available random position
-Grid.prototype.randomAvailableCell = function () {
+sGrid.prototype.randomAvailableCell = function () {
   var cells = this.availableCells();
 
   if (cells.length) {
@@ -201,7 +212,7 @@ Grid.prototype.randomAvailableCell = function () {
   }
 };
 
-Grid.prototype.availableCells = function () {
+sGrid.prototype.availableCells = function () {
   var cells = [];
 
   this.eachCell(function (x, y, tile) {
@@ -214,7 +225,7 @@ Grid.prototype.availableCells = function () {
 };
 
 // Call callback for every cell
-Grid.prototype.eachCell = function (callback) {
+sGrid.prototype.eachCell = function (callback) {
   for (var x = 0; x < this.size; x++) {
     for (var y = 0; y < this.size; y++) {
       callback(x, y, this.cells[x][y]);
@@ -223,20 +234,20 @@ Grid.prototype.eachCell = function (callback) {
 };
 
 // Check if there are any cells available
-Grid.prototype.cellsAvailable = function () {
+sGrid.prototype.cellsAvailable = function () {
   return !!this.availableCells().length;
 };
 
 // Check if the specified cell is taken
-Grid.prototype.cellAvailable = function (cell) {
+sGrid.prototype.cellAvailable = function (cell) {
   return !this.cellOccupied(cell);
 };
 
-Grid.prototype.cellOccupied = function (cell) {
+sGrid.prototype.cellOccupied = function (cell) {
   return !!this.cellContent(cell);
 };
 
-Grid.prototype.cellContent = function (cell) {
+sGrid.prototype.cellContent = function (cell) {
   if (this.withinBounds(cell)) {
     return this.cells[cell.x][cell.y];
   } else {
@@ -245,20 +256,20 @@ Grid.prototype.cellContent = function (cell) {
 };
 
 // Inserts a tile at its position
-Grid.prototype.insertTile = function (tile) {
+sGrid.prototype.insertTile = function (tile) {
   this.cells[tile.x][tile.y] = tile;
 };
 
-Grid.prototype.removeTile = function (tile) {
+sGrid.prototype.removeTile = function (tile) {
   this.cells[tile.x][tile.y] = null;
 };
 
-Grid.prototype.withinBounds = function (position) {
+sGrid.prototype.withinBounds = function (position) {
   return position.x >= 0 && position.x < this.size &&
          position.y >= 0 && position.y < this.size;
 };
 
-Grid.prototype.serialize = function () {
+sGrid.prototype.serialize = function () {
   var cellState = [];
 
   for (var x = 0; x < this.size; x++) {

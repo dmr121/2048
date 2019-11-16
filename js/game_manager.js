@@ -26,7 +26,6 @@ GameManager.prototype.runRobot = function () {
   }
 
   var bestMove = getBestMove(this.storageManager.getGameState(), this.score);
-
   this.move(bestMove);
 
   var self = this;

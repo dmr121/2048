@@ -1,38 +1,59 @@
 function getBestMove(grid, score) {
+	var board = new Grid(4, grid.grid.cells);
 	var scores = [[], [], [], []];
-	values = [0, score];
-	for(i = 0; i < 100; ++i) {
-		tempBoard = new Grid(4, grid.grid.cells);
-		var move = Math.floor(Math.random() * 4);
-		values = tempBoard.move(move, values[1]);
 
-		for(j = 0; j < 100; ++j) {
-			var newMove = Math.floor(Math.random() * 4);
-			values = values[0].move(newMove, values[1]);
-		}
-		scores[move].push(values[1]);
+	for(i = 0; i < 500; ++i) {
+		var move = Math.floor(Math.random() * 4);
+		var newScore = randomRun(grid, score, move, 100);
+		scores[move].push(newScore);
 	}
 
+	console.log(scores);
 	avgScores = [];
-	for(i = 0; i < 4; ++i) {
-		tempScore = 0;
-		for (j = 0; j < scores[i].length; ++j) {
-			tempScore += scores[i][j];
-		}
-		tempScore /= scores[i].length;
-		avgScores.push(tempScore);
+	for(var i = 0; i < 4; ++i) {
+		avgScores.push(avg(scores[i]));
 	}
 
 	var bestMove = avgScores.indexOf(highestScore(avgScores));
+	console.log(bestMove);
 	return bestMove;
 }
 
-function getBestMoveR(grid, score, numIter) {
-	if(numIter == 0) {
-		return;
+function randomRun(grid, score, direction, numRuns) {
+	var board = new sGrid(4, grid.grid.cells);
+	var data = board.move(direction, score);
+	score = data.score;
+	if(!data.moved) {
+		return score;
 	}
+	for (var i = 0; i < numRuns; ++i) {
+		data = board.move(Math.floor(Math.random() * 4), score);
+		score = data.score;
+		if(data.over) {
+			return score;
+		}
+	}
+}
 
-	
+function sum(scores) {
+	var total = 0;
+	for(i = 0; i< scores.length; ++i) {
+		total += scores[i];
+	}
+	return total;
+}
+
+function avg(scores) {
+	var total = 0;
+	var numScores = scores.length;
+	for(i = 0; i< scores.length; ++i) {
+		if(scores[i]) {
+			total += scores[i];
+		} else {
+			--numScores;
+		}
+	}
+	return total/numScores;
 }
 
 function highestScore(scores) {
