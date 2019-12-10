@@ -71,9 +71,14 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
-  document.getElementById("start-button").addEventListener('click', function(e) {
+  document.getElementById("random-button").addEventListener('click', function(e) {
     e.preventDefault();
-    self.emit('runRobot')
+    self.emit('runRandom')
+  })
+
+  document.getElementById("smart-button").addEventListener('click', function(e) {
+    e.preventDefault();
+    self.emit('runSmart')
   })
 
   // Respond to button presses

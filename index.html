@@ -67,11 +67,20 @@
     </div>
 
     <div class="ai-elements">
-      <button id="start-button">Start Robot</button>
+      <button style="display:inline;float:left"id="random-button">Run Random Solver</button>
+      <button id="smart-button">Run Smart Solver</button>
       <div class="slide-container">
-        <input type="range" min="10" max="500" value="100" id="speed-range" style="all:unset,height:1px">
+        <input type="range" min="50" max="300" value="100" id="speed-range" style="all:unset;background-color:#8f7a66;height:8px;border-radius:10px;" oninput="changeLooksAhead()">
+        <p style="font-weight:bold;">Looks ahead: </p>
+        <p style="color:red" id="looks-ahead">10  0</p>
       </div>
     </div>
+
+    <script>
+      function changeLooksAhead() {
+        document.getElementById("looks-ahead").innerHTML = document.getElementById("speed-range").value;
+      }
+    </script>
 
     <div class="game-container">
       <div class="game-message">
@@ -146,6 +155,8 @@
       <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
     </footer>
   </div>
+  <p id="in"></p>
+  <p id="out"></p>
 
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>

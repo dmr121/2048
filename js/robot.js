@@ -1,21 +1,27 @@
-function getBestMove(grid, score) {
+
+function getBestSmartMove(grid, score) {
+	var board = new sGrid(4, grid.grid.cells);
+	var cellValue = board.cells[i][j].value;
+
+	//return move;
+}
+
+function getBestMove(grid, score, looks) {
 	var board = new Grid(4, grid.grid.cells);
 	var scores = [[], [], [], []];
 
 	for(i = 0; i < 500; ++i) {
 		var move = Math.floor(Math.random() * 4);
-		var newScore = randomRun(grid, score, move, 100);
+		var newScore = randomRun(grid, score, move, looks);
 		scores[move].push(newScore);
 	}
 
-	console.log(scores);
 	avgScores = [];
 	for(var i = 0; i < 4; ++i) {
 		avgScores.push(avg(scores[i]));
 	}
 
 	var bestMove = avgScores.indexOf(highestScore(avgScores));
-	console.log(bestMove);
 	return bestMove;
 }
 

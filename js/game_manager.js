@@ -11,43 +11,77 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
-  this.inputManager.on("runRobot", function() {
+  this.inputManager.on("runRandom", function() {
     this.robotRunning = toggleStartButton()
-    this.runRobot();
+    this.runRandom();
+  }.bind(this));
+
+  this.inputManager.on("runSmart", function() {
+    this.robotRunning = toggleSmartButton()
+    this.runSmart();
   }.bind(this));
 
   this.setup();
 }
 
-// The AI that plays the game automatically
-GameManager.prototype.runRobot = function () {
+// Random AI
+GameManager.prototype.runRandom = function () {
   if (!this.robotRunning) {
     return;
   }
 
-  var bestMove = getBestMove(this.storageManager.getGameState(), this.score);
+  var looksAhead = document.getElementById("speed-range").value;
+
+  var bestMove = getBestMove(this.storageManager.getGameState(), this.score, looksAhead);
   this.move(bestMove);
 
   var self = this;
   setTimeout(function() {
-    self.runRobot();
+    self.runRandom();
+  }, 100);
+};
+
+// Smart AI
+GameManager.prototype.runSmart = function () {
+  if (!this.robotRunning) {
+    return;
+  }
+
+  var bestMove = getBestSmartMove(this.storageManager.getGameState(), this.score);
+  this.move(bestMove);
+
+  var self = this;
+  setTimeout(function() {
+    self.runSmart();
   }, 100);
 };
 
 function toggleStartButton(){
-  var startButton = document.getElementById("start-button")
-  if (startButton.innerHTML == "Start Robot"){
+  var startButton = document.getElementById("random-button")
+  if (startButton.innerHTML === "Run Random Solver"){
     startButton.innerHTML = "Pause";
     return true;
   } else {
-    startButton.innerHTML = "Start Robot";
+    startButton.innerHTML = "Run Random Solver";
+    return false;
+  }
+}
+
+function toggleSmartButton(){
+  var startButton = document.getElementById("smart-button")
+  if (startButton.innerHTML == "Run Smart Solver"){
+    startButton.innerHTML = "Pause";
+    return true;
+  } else {
+    startButton.innerHTML = "Run Smart Solver";
     return false;
   }
 }
 
 // Restart the game
 GameManager.prototype.restart = function () {
-  document.getElementById("start-button").innerHTML = "Start Robot";
+  document.getElementById("random-button").innerHTML = "Run Random Solver";
+  document.getElementById("smart-button").innerHTML = "Run Smart Solver";
   this.robotRunning = false;
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
